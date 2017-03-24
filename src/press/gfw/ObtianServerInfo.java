@@ -85,7 +85,6 @@ public class ObtianServerInfo extends Thread {
 			saveConfig(nodes, nodes[0], port, pwd);
 		} catch (Exception e) {
 			config.log(e.getLocalizedMessage());
-			javax.swing.JOptionPane.showMessageDialog(null, e.getLocalizedMessage(),"GFW.Press",javax.swing.JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 		}
 	}
