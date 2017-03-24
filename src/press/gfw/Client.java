@@ -78,7 +78,11 @@ public class Client extends Thread {
 
 	public Client(String serverHost, String serverPort, String password, String listenPort) {
 
-		this(serverHost, (serverPort != null && (serverPort = serverPort.trim()).matches("\\d+")) ? Integer.valueOf(serverPort) : 0, password, (listenPort != null && (listenPort = listenPort.trim()).matches("\\d+")) ? Integer.valueOf(listenPort) : 0);
+		this(serverHost,
+				(serverPort != null && (serverPort = serverPort.trim()).matches("\\d+")) ? Integer.valueOf(serverPort)
+						: 0,
+				password, (listenPort != null && (listenPort = listenPort.trim()).matches("\\d+"))
+						? Integer.valueOf(listenPort) : 0);
 
 	}
 
@@ -183,7 +187,8 @@ public class Client extends Thread {
 	 */
 	public void run() {
 
-		if (serverHost == null || (serverHost = serverHost.trim()).length() == 0 || serverPort == 0 || listenPort == 0 || key == null) {
+		if (serverHost == null || (serverHost = serverHost.trim()).length() == 0 || serverPort == 0 || listenPort == 0
+				|| key == null) {
 
 			status = "启动失败：配置错误";
 

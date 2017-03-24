@@ -121,7 +121,8 @@ public class Server extends Thread {
 	 */
 	public Server(String proxyHost, int proxyPort, String listenPort, String password) {
 
-		this(proxyHost, proxyPort, (listenPort != null && (listenPort = listenPort.trim()).matches("\\d+")) ? Integer.valueOf(listenPort) : 0, password);
+		this(proxyHost, proxyPort, (listenPort != null && (listenPort = listenPort.trim()).matches("\\d+"))
+				? Integer.valueOf(listenPort) : 0, password);
 
 	}
 
@@ -186,7 +187,7 @@ public class Server extends Thread {
 	 */
 	private void loadConfig() {
 
-		JSONObject json = config.getServerConfig();
+		JSONObject json = config.getServerJSON();
 
 		if (json != null) {
 
@@ -196,7 +197,8 @@ public class Server extends Thread {
 
 			String _proxyPort = (String) json.get("ProxyPort");
 
-			proxyPort = (_proxyPort == null || !(_proxyPort = _proxyPort.trim()).matches("\\d+")) ? proxyPort : Integer.valueOf(_proxyPort);
+			proxyPort = (_proxyPort == null || !(_proxyPort = _proxyPort.trim()).matches("\\d+")) ? proxyPort
+					: Integer.valueOf(_proxyPort);
 
 		}
 

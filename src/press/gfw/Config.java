@@ -51,34 +51,64 @@ public class Config {
 
 	}
 
-	private File clientFile = null;
 
-	private File serverFile = null;
+	private File configFile = null;
 
 	private File userFile = null;
+	
 
 	private long userFileTime = 0L;
 
 	public Config() {
 
-		clientFile = new File("client.json");
-
-		serverFile = new File("server.json");
-
+		configFile = new File("config.json");
 		userFile = new File("user.txt");
-
+		
 	}
+
 
 	/**
-	 * 获取客户端配置文件
-	 * 
+	 * 得到全部配置信息
 	 * @return
 	 */
-	public JSONObject getClientConfig() {
-
-		return getJSON(read(clientFile));
-
+	public JSONObject getConfigJSON(){
+		return (JSONObject)getJSON(read(configFile));
 	}
+	
+	/**
+	 * 得到客户端信息
+	 * @return
+	 */
+	public JSONObject getClientJSON(){
+		return (JSONObject)getJSON(read(configFile)).get("client");
+	}
+	
+
+	/**
+	 * 得到服务器信息
+	 * @return
+	 */
+	public JSONObject getServerJSON(){
+		return (JSONObject)getJSON(read(configFile)).get("server");
+	}
+	
+
+	/**
+	 * 得到用户信息
+	 * @return
+	 */
+	public JSONObject getUserJSON(){
+		return (JSONObject)getJSON(read(configFile)).get("user");
+	}
+	
+	/**
+	 * 读取配置文件
+	 * @return
+	 */
+	public void saveConfigJSON(JSONObject json){
+		save(configFile, json.toJSONString());
+	}
+	
 
 	/**
 	 * 字符串转JSON对象
@@ -112,16 +142,6 @@ public class Config {
 
 	}
 
-	/**
-	 * 获取服务器配置
-	 * 
-	 * @return
-	 */
-	public JSONObject getServerConfig() {
-
-		return getJSON(read(serverFile));
-
-	}
 
 	public Hashtable<String, String> getUser() {
 
@@ -176,7 +196,7 @@ public class Config {
 	 * 
 	 * @param o
 	 */
-	private void log(Object o) {
+	public void log(Object o) {
 
 		String time = (new Timestamp(System.currentTimeMillis())).toString().substring(0, 19);
 
@@ -315,66 +335,5 @@ public class Config {
 
 	}
 
-	/**
-	 * 保存客户端配置文件
-	 * 
-	 * @param json
-	 * @return
-	 */
-	@SuppressWarnings("unchecked")
-	public boolean saveClientConfig(JSONObject json) {
-
-		if (json == null) {
-
-			return false;
-
-		}
-
-		JSONObject _json = getClientConfig();
-
-		if (_json == null) {
-
-			_json = json;
-
-		} else {
-
-			_json.putAll(json);
-
-		}
-
-		return save(clientFile, _json.toJSONString());
-
-	}
-
-	/**
-	 * 保存服务器配置文件
-	 * 
-	 * @param json
-	 * @return
-	 */
-	@SuppressWarnings("unchecked")
-	public boolean saveServerConfig(JSONObject json) {
-
-		if (json == null) {
-
-			return false;
-
-		}
-
-		JSONObject _json = getServerConfig();
-
-		if (_json == null) {
-
-			_json = json;
-
-		} else {
-
-			_json.putAll(json);
-
-		}
-
-		return save(serverFile, _json.toJSONString());
-
-	}
 
 }

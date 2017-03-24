@@ -1,0 +1,17 @@
+{
+	"client":{
+		"ServerHost":"203.104.192.230",
+		"ServerPort":"10243",
+		"ProxyPort":"3128",
+		"Password":"7kKKfJpV48"
+	},
+	"server":{
+		"serverNode":["203.104.192.230","",""],
+		"ProxyPort":"3128",
+		"ProxyHost":"127.0.0.1"
+	},
+	"user":{
+		"user":"",
+		"password":""
+	}
+}

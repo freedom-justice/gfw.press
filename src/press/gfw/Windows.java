@@ -34,13 +34,16 @@ import java.awt.event.WindowListener;
 import java.io.IOException;
 import java.sql.Timestamp;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
@@ -90,9 +93,9 @@ public class Windows extends JFrame {
 
 					boolean edit = false;
 
-					if (!serverHost.equals(serverHostField.getText().trim())) {
+					if (!serverHost.equals(serverHostField.getSelectedItem().toString().trim())) {
 
-						serverHost = serverHostField.getText().trim();
+						serverHost = serverHostField.getSelectedItem().toString().trim();
 
 						edit = true;
 
@@ -131,13 +134,28 @@ public class Windows extends JFrame {
 						edit = true;
 
 					}
+					
+					if(!loginName.equals(loginNameField.getText().trim())){
+
+						loginName = loginNameField.getText().trim();
+
+						edit = true;
+					}
+					
+					String loginPwdString = new String(loginPwdField.getPassword()).trim();
+					if(!loginPwd.equals(loginPwdString)){
+
+						loginPwd = loginPwdString;
+
+						edit = true;
+					}
 
 					if (edit) {
 
 						saveConfig();
 
 					}
-
+					
 					start();
 
 					break;
@@ -146,7 +164,7 @@ public class Windows extends JFrame {
 
 					setVisible(false);
 
-					serverHostField.setText(serverHost);
+					serverHostField.setSelectedIndex(0);
 
 					serverPortField.setText(serverPort);
 
@@ -248,11 +266,15 @@ public class Windows extends JFrame {
 
 	private Config config = null;
 
-	private String serverHost = "", serverPort = "", password = "", proxyPort = "";
+	private String serverHost = "", serverPort = "", password = "", proxyPort = "", loginName = "", loginPwd = "";
 
-	private JTextField serverHostField = new JTextField(), serverPortField = new JTextField(), proxyPortField = new JTextField();
+	private String[] serverHosts=null;
+	
+	private JComboBox serverHostField = new JComboBox();
+	
+	private JTextField serverPortField = new JTextField(), proxyPortField = new JTextField(), loginNameField = new JTextField();
 
-	private JPasswordField passwordField = new JPasswordField();
+	private JPasswordField passwordField = new JPasswordField(), loginPwdField = new JPasswordField();
 
 	public Windows() {
 
@@ -329,10 +351,17 @@ public class Windows extends JFrame {
 		// 服务面板
 		JPanel serverPanel = new JPanel();
 
-		GridLayout serverLayout = new GridLayout(4, 2, 0, 16);
+		GridLayout serverLayout = new GridLayout(6, 2, 0, 5);
 
 		serverPanel.setLayout(serverLayout);
+		// 帐号信息
+		serverPanel.add(new JLabel("登录帐号："));
 
+		serverPanel.add(loginNameField);
+		
+		serverPanel.add(new JLabel("登录密码："));
+
+		serverPanel.add(loginPwdField);
 		// 服务信息
 
 		serverPanel.add(new JLabel("节点地址："));
@@ -350,6 +379,7 @@ public class Windows extends JFrame {
 		serverPanel.add(new JLabel("本地端口："));
 
 		serverPanel.add(proxyPortField);
+		
 
 		loadConfig();
 
@@ -395,7 +425,7 @@ public class Windows extends JFrame {
 
 		Dimension dimemsion = Toolkit.getDefaultToolkit().getScreenSize();
 
-		setSize(480, 270);
+		setSize(480, 300);
 
 		setLocation((int) (dimemsion.getWidth() - getWidth()) / 2, (int) (dimemsion.getHeight() - getHeight()) / 2);
 
@@ -414,22 +444,51 @@ public class Windows extends JFrame {
 
 	private void loadConfig() {
 
-		JSONObject json = config.getClientConfig();
+		JSONObject client = config.getClientJSON();
+		JSONObject user = config.getUserJSON();
+		JSONObject server = config.getServerJSON();
 
-		if (json != null) {
+		if (client != null) {
 
-			serverHost = json.get("ServerHost") == null ? "" : (String) json.get("ServerHost");
+			serverHost = client.get("ServerHost") == null ? "" : (String) client.get("ServerHost");
 
-			serverPort = json.get("ServerPort") == null ? "" : (String) json.get("ServerPort");
+			serverPort = client.get("ServerPort") == null ? "" : (String) client.get("ServerPort");
 
-			password = json.get("Password") == null ? "" : (String) json.get("Password");
+			password = client.get("Password") == null ? "" : (String) client.get("Password");
 
-			proxyPort = json.get("ProxyPort") == null ? "" : (String) json.get("ProxyPort");
+			proxyPort = client.get("ProxyPort") == null ? "" : (String) client.get("ProxyPort");
 
 		}
-
+		
+		if(user != null){
+			loginName = user.get("user") == null ? "" : (String) user.get("user");
+			loginPwd = user.get("password") == null ? "" : (String) user.get("password");
+		}
+		
+		// 登录帐号信息
+		
+		loginNameField.setText(loginName);
+		
+		loginPwdField.setText(loginPwd);
+		
 		// 服务信息
-		serverHostField.setText(serverHost);
+		JSONArray array = (JSONArray)server.get("serverNode");
+		
+		serverHostField.removeAllItems();
+		
+		Object[] nodes = array.toArray();
+		
+		serverHosts = new String[nodes.length];
+		
+		for (int i = 0; i < nodes.length; i++) {
+			serverHosts[i] = nodes[i]+"";
+		}
+		
+		serverHostField.setModel(new DefaultComboBoxModel<Object>(nodes));
+		
+		serverHostField.setSelectedItem(serverHost);
+		
+		serverHostField.updateUI();
 
 		serverPortField.setText(serverPort);
 
@@ -455,22 +514,53 @@ public class Windows extends JFrame {
 	@SuppressWarnings("unchecked")
 	private void saveConfig() {
 
-		JSONObject json = new JSONObject();
+		JSONObject json = config.getConfigJSON();
 
-		json.put("ServerHost", serverHost);
+		((JSONObject)json.get("user")).put("user", loginName);
+		
+		((JSONObject)json.get("user")).put("password", loginPwd);
+		
+		((JSONObject)json.get("client")).put("ServerHost", serverHost);
 
-		json.put("ServerPort", serverPort);
+		((JSONObject)json.get("client")).put("ServerPort", serverPort);
 
-		json.put("Password", password);
+		((JSONObject)json.get("client")).put("Password", password);
 
-		json.put("ProxyPort", proxyPort);
+		((JSONObject)json.get("client")).put("ProxyPort", proxyPort);
 
-		config.saveClientConfig(json);
+		config.saveConfigJSON(json);
+		
+		
 
 	}
 
 	public void start() {
 
+		new ObtianServerInfo(loginName,loginPwd,new UpdateCallback() {
+			@Override
+			public void dataUpdate(String[] nodes,String port, String pwd) {
+				boolean isUpdate = false;
+				if(!port.equals(serverPort)){
+					serverPort = port;
+					isUpdate = true;
+				}
+				if(!pwd.equals(password)){
+					password = pwd;
+					isUpdate = true;
+				}
+				for(int i=0;i < nodes.length;i++){
+					if(!nodes[i].equals(serverHosts[i])){
+						isUpdate = true;
+						break;
+					}
+				}
+				if(isUpdate){
+					start();
+					loadConfig();
+				}
+			}
+		}).start();
+		
 		if (client != null && !client.isKill()) {
 
 			if (serverHost.equals(client.getServerHost()) && serverPort.equals(String.valueOf(client.getServerPort())) && password.equals(client.getPassword()) && proxyPort.equals(String.valueOf(client.getListenPort()))) {
@@ -486,7 +576,7 @@ public class Windows extends JFrame {
 		}
 
 		client = new Client(serverHost, serverPort, password, proxyPort);
-
+		
 		client.start();
 
 		// log(client.getName());
