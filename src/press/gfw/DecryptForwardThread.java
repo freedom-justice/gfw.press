@@ -34,7 +34,7 @@ import javax.crypto.SecretKey;
  */
 public class DecryptForwardThread extends Thread {
 
-	private static final int BUFFER_SIZE_MAX = 1024 * 768; // 缓冲区可接受的最大值，768K
+	private static final int BUFFER_SIZE_MAX = 1024 * 256; // 缓冲区可接受的最大值，256K
 
 	private InputStream inputStream = null;
 
@@ -91,89 +91,47 @@ public class DecryptForwardThread extends Thread {
 	public void run() {
 
 		byte[] buffer = null;
-
 		byte[] size_bytes = null;
-
 		int[] sizes = null;
-
 		byte[] decrypt_bytes = null;
-
 		try {
-
 			while (true) {
-
 				buffer = new byte[Encrypt.ENCRYPT_SIZE];
-
 				int read_num = inputStream.read(buffer);
-
 				if (read_num == -1 || read_num != Encrypt.ENCRYPT_SIZE) {
-
 					break;
-
 				}
-
 				size_bytes = aes.decrypt(key, buffer);
-
 				if (size_bytes == null) {
-
 					break; // 解密出错，退出
-
 				}
-
 				sizes = aes.getBlockSizes(size_bytes);
-
 				if (sizes == null || sizes.length != 2 || sizes[0] > BUFFER_SIZE_MAX) {
-
 					break;
-
 				}
-
 				int size_count = sizes[0] + sizes[1];
-
 				buffer = new byte[size_count];
-
 				int read_count = 0;
-
 				while (read_count < size_count) {
-
 					read_num = inputStream.read(buffer, read_count, size_count - read_count);
-
 					if (read_num == -1) {
-
 						break;
-
 					}
-
 					read_count += read_num;
-
 				}
-
 				if (read_count != size_count) {
-
 					break;
-
 				}
-
 				if (sizes[1] > 0) { // 如果存在噪音数据
-
 					byte[] _buffer = new byte[sizes[0]];
-
 					System.arraycopy(buffer, 0, _buffer, 0, _buffer.length);
-
 					decrypt_bytes = aes.decrypt(key, _buffer);
-
 				} else {
-
 					decrypt_bytes = aes.decrypt(key, buffer);
-
 				}
-
 				if (decrypt_bytes == null) {
-
 					break;
-
 				}
-
 				outputStream.write(decrypt_bytes);
 
 				outputStream.flush();

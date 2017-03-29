@@ -19,9 +19,12 @@
 **/
 package press.gfw;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.StringReader;
 import java.net.Socket;
 import java.sql.Timestamp;
 
@@ -147,7 +150,6 @@ public class ClientThread extends PointThread {
 
 		// 开始转发
 		forwarding = true;
-
 		EncryptForwardThread forwardServer = new EncryptForwardThread(this, agentIn, serverOut, key);
 		forwardServer.start();
 

@@ -34,11 +34,11 @@ import javax.crypto.SecretKey;
  */
 public class EncryptForwardThread extends Thread {
 
-	private static final int BUFFER_SIZE_MIN = 1024 * 128; // 缓冲区最小值，128K
+	private static final int BUFFER_SIZE_MIN = 1024 * 4; // 缓冲区最小值，4K
 
-	private static final int BUFFER_SIZE_MAX = 1024 * 512; // 缓冲区最大值，512K
+	private static final int BUFFER_SIZE_MAX = 1024 * 128; // 缓冲区最大值，128K
 
-	private static final int BUFFER_SIZE_STEP = 1024 * 128; // 缓冲区自动调整的步长值，128K
+	private static final int BUFFER_SIZE_STEP = 1024 * 4; // 缓冲区自动调整的步长值，4K
 
 	private InputStream inputStream = null;
 
@@ -62,15 +62,10 @@ public class EncryptForwardThread extends Thread {
 	 * 
 	 */
 	public EncryptForwardThread(PointThread parent, InputStream inputStream, OutputStream outputStream, SecretKey key) {
-
 		this.parent = parent;
-
 		this.inputStream = inputStream;
-
 		this.outputStream = outputStream;
-
 		this.key = key;
-
 		aes = new Encrypt();
 
 	}
@@ -95,65 +90,42 @@ public class EncryptForwardThread extends Thread {
 	public void run() {
 
 		byte[] buffer = new byte[BUFFER_SIZE_MIN];
-
 		byte[] read_bytes = null;
-
 		byte[] encrypt_bytes = null;
-
 		try {
-
 			while (true) {
-
 				int read_num = inputStream.read(buffer);
-
 				if (read_num == -1) {
-
 					break;
-
 				}
-
 				read_bytes = new byte[read_num];
-
 				System.arraycopy(buffer, 0, read_bytes, 0, read_num);
-
 				encrypt_bytes = aes.encryptNet(key, read_bytes);
-
 				if (encrypt_bytes == null) {
-
 					break; // 加密出错，退出
-
 				}
-
 				outputStream.write(encrypt_bytes);
-
 				outputStream.flush();
-
+				// 缓冲区过小，自动增大缓冲区
 				if (read_num == buffer.length && read_num < BUFFER_SIZE_MAX) { // 自动调整缓冲区大小
-
+					buffer = null;
 					buffer = new byte[read_num + BUFFER_SIZE_STEP];
-
-					// log(this.getName() + " 缓冲区大小自动调整为：" + buffer.length);
-
+					// 缓冲区过大，自动增小缓冲区
+					
 				} else if (read_num < (buffer.length - BUFFER_SIZE_STEP) && (buffer.length - BUFFER_SIZE_STEP) >= BUFFER_SIZE_MIN) {
-
-					buffer = new byte[buffer.length - BUFFER_SIZE_STEP];
-
-					// log(this.getName() + " 缓冲区大小自动调整为：" + +buffer.length);
-
+					int len = buffer.length - BUFFER_SIZE_STEP;
+					buffer = null;
+					buffer = new byte[len];
+					System.gc();
 				}
-
 			}
-
 		} catch (IOException ex) {
 
 		}
 
 		buffer = null;
-
 		read_bytes = null;
-
 		encrypt_bytes = null;
-
 		parent.over();
 
 	}

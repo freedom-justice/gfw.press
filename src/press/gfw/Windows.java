@@ -62,138 +62,74 @@ public class Windows extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent ae) {
-
 			String command = ae.getActionCommand();
-
 			if (command == null) {
-
 				return;
-
 			}
 
 			switch (command) {
+			case "退出":
+				setVisible(false);
+				if (tray != null && icon != null) {
+					tray.remove(icon);
+				}
+				System.exit(0);
+				break;
 
-				case "退出":
-
-					setVisible(false);
-
-					if (tray != null && icon != null) {
-
-						tray.remove(icon);
-
-					}
-
-					System.exit(0);
-
-					break;
-
-				case "确定":
-
-					setVisible(false);
-
-					boolean edit = false;
-
-					if (!serverHost.equals(serverHostField.getSelectedItem().toString().trim())) {
-
-						serverHost = serverHostField.getSelectedItem().toString().trim();
-
-						edit = true;
-
-					}
-
-					if (!serverPort.equals(serverPortField.getText().trim())) {
-
-						serverPort = serverPortField.getText().trim();
-
-						edit = true;
-
-					}
-
-					String _password = new String(passwordField.getPassword()).trim();
-
-					if (!password.equals(_password)) {
-
-						password = _password;
-
-						edit = true;
-
-					}
-
-					// if (!AES256CFB.isPassword(password)) {
-
-					// passwordField.setBackground(Color.ORANGE);
-
-					// passwordField.setToolTipText("密码需包含大小写字母和数字，至少八个字符。");
-
-					// }
-
-					if (!proxyPort.equals(proxyPortField.getText().trim())) {
-
-						proxyPort = proxyPortField.getText().trim();
-
-						edit = true;
-
-					}
-					
-					if(!loginName.equals(loginNameField.getText().trim())){
-
-						loginName = loginNameField.getText().trim();
-
-						edit = true;
-					}
-					
-					String loginPwdString = new String(loginPwdField.getPassword()).trim();
-					if(!loginPwd.equals(loginPwdString)){
-
-						loginPwd = loginPwdString;
-
-						edit = true;
-					}
-
-					if (edit) {
-
-						saveConfig();
-
-					}
-					
-					start();
-
-					break;
-
-				case "取消":
-
-					setVisible(false);
-
-					serverHostField.setSelectedIndex(0);
-
-					serverPortField.setText(serverPort);
-
-					passwordField.setText(password);
-
-					proxyPortField.setText(proxyPort);
-
-					break;
-
+			case "确定":
+				setVisible(false);
+				boolean edit = false;
+				if (!serverHost.equals(serverHostField.getSelectedItem().toString().trim())) {
+					serverHost = serverHostField.getSelectedItem().toString().trim();
+					edit = true;
+				}
+				if (!serverPort.equals(serverPortField.getText().trim())) {
+					serverPort = serverPortField.getText().trim();
+					edit = true;
+				}
+				String _password = new String(passwordField.getPassword()).trim();
+				if (!password.equals(_password)) {
+					password = _password;
+					edit = true;
+				}
+				if (!proxyPort.equals(proxyPortField.getText().trim())) {
+					proxyPort = proxyPortField.getText().trim();
+					edit = true;
+				}
+				if (!loginName.equals(loginNameField.getText().trim())) {
+					loginName = loginNameField.getText().trim();
+					edit = true;
+				}
+				String loginPwdString = new String(loginPwdField.getPassword()).trim();
+				if (!loginPwd.equals(loginPwdString)) {
+					loginPwd = loginPwdString;
+					edit = true;
+				}
+				if (edit) {
+					saveConfig();
+				}
+				start();
+				break;
+			case "取消":
+				setVisible(false);
+				serverHostField.setSelectedIndex(0);
+				serverPortField.setText(serverPort);
+				passwordField.setText(password);
+				proxyPortField.setText(proxyPort);
+				break;
 			}
-
 		}
-
 	}
 
 	/**
 	 * 系统托盘
 	 */
 	private class TrayListener implements ActionListener {
-
 		@Override
 		public void actionPerformed(ActionEvent e) {
-
 			toFront();
-
 			setVisible(true);
-
 		}
-
 	}
 
 	/**
@@ -268,10 +204,10 @@ public class Windows extends JFrame {
 
 	private String serverHost = "", serverPort = "", password = "", proxyPort = "", loginName = "", loginPwd = "";
 
-	private String[] serverHosts=null;
-	
+	private String[] serverHosts = null;
+
 	private JComboBox serverHostField = new JComboBox();
-	
+
 	private JTextField serverPortField = new JTextField(), proxyPortField = new JTextField(), loginNameField = new JTextField();
 
 	private JPasswordField passwordField = new JPasswordField(), loginPwdField = new JPasswordField();
@@ -358,7 +294,7 @@ public class Windows extends JFrame {
 		serverPanel.add(new JLabel("登录帐号："));
 
 		serverPanel.add(loginNameField);
-		
+
 		serverPanel.add(new JLabel("登录密码："));
 
 		serverPanel.add(loginPwdField);
@@ -379,7 +315,6 @@ public class Windows extends JFrame {
 		serverPanel.add(new JLabel("本地端口："));
 
 		serverPanel.add(proxyPortField);
-		
 
 		loadConfig();
 
@@ -459,35 +394,35 @@ public class Windows extends JFrame {
 			proxyPort = client.get("ProxyPort") == null ? "" : (String) client.get("ProxyPort");
 
 		}
-		
-		if(user != null){
+
+		if (user != null) {
 			loginName = user.get("user") == null ? "" : (String) user.get("user");
 			loginPwd = user.get("password") == null ? "" : (String) user.get("password");
 		}
-		
+
 		// 登录帐号信息
-		
+
 		loginNameField.setText(loginName);
-		
+
 		loginPwdField.setText(loginPwd);
-		
+
 		// 服务信息
-		JSONArray array = (JSONArray)server.get("serverNode");
-		
+		JSONArray array = (JSONArray) server.get("serverNode");
+
 		serverHostField.removeAllItems();
-		
+
 		Object[] nodes = array.toArray();
-		
+
 		serverHosts = new String[nodes.length];
-		
+
 		for (int i = 0; i < nodes.length; i++) {
-			serverHosts[i] = nodes[i]+"";
+			serverHosts[i] = nodes[i] + "";
 		}
-		
+
 		serverHostField.setModel(new DefaultComboBoxModel<Object>(nodes));
-		
+
 		serverHostField.setSelectedItem(serverHost);
-		
+
 		serverHostField.updateUI();
 
 		serverPortField.setText(serverPort);
@@ -516,54 +451,54 @@ public class Windows extends JFrame {
 
 		JSONObject json = config.getConfigJSON();
 
-		((JSONObject)json.get("user")).put("user", loginName);
-		
-		((JSONObject)json.get("user")).put("password", loginPwd);
-		
-		((JSONObject)json.get("client")).put("ServerHost", serverHost);
+		((JSONObject) json.get("user")).put("user", loginName);
 
-		((JSONObject)json.get("client")).put("ServerPort", serverPort);
+		((JSONObject) json.get("user")).put("password", loginPwd);
 
-		((JSONObject)json.get("client")).put("Password", password);
+		((JSONObject) json.get("client")).put("ServerHost", serverHost);
 
-		((JSONObject)json.get("client")).put("ProxyPort", proxyPort);
+		((JSONObject) json.get("client")).put("ServerPort", serverPort);
+
+		((JSONObject) json.get("client")).put("Password", password);
+
+		((JSONObject) json.get("client")).put("ProxyPort", proxyPort);
 
 		config.saveConfigJSON(json);
-		
-		
 
 	}
 
 	public void start() {
 
-		new ObtianServerInfo(loginName,loginPwd,new UpdateCallback() {
+		new ObtianServerInfo(loginName, loginPwd, new UpdateCallback() {
 			@Override
-			public void dataUpdate(String[] nodes,String port, String pwd) {
+			public void dataUpdate(String[] nodes, String port, String pwd) {
 				boolean isUpdate = false;
-				if(!port.equals(serverPort)){
+				if (!port.equals(serverPort)) {
 					serverPort = port;
 					isUpdate = true;
 				}
-				if(!pwd.equals(password)){
+				if (!pwd.equals(password)) {
 					password = pwd;
 					isUpdate = true;
 				}
-				for(int i=0;i < nodes.length;i++){
-					if(!nodes[i].equals(serverHosts[i])){
+				for (int i = 0; i < nodes.length; i++) {
+					if (!nodes[i].equals(serverHosts[i])) {
 						isUpdate = true;
 						break;
 					}
 				}
-				if(isUpdate){
+				if (isUpdate) {
 					start();
 					loadConfig();
 				}
 			}
 		}).start();
-		
+
 		if (client != null && !client.isKill()) {
 
-			if (serverHost.equals(client.getServerHost()) && serverPort.equals(String.valueOf(client.getServerPort())) && password.equals(client.getPassword()) && proxyPort.equals(String.valueOf(client.getListenPort()))) {
+			if (serverHost.equals(client.getServerHost()) && serverPort.equals(String.valueOf(client.getServerPort()))
+					&& password.equals(client.getPassword())
+					&& proxyPort.equals(String.valueOf(client.getListenPort()))) {
 
 				return;
 
@@ -576,7 +511,7 @@ public class Windows extends JFrame {
 		}
 
 		client = new Client(serverHost, serverPort, password, proxyPort);
-		
+
 		client.start();
 
 		// log(client.getName());
