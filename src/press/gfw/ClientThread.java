@@ -19,12 +19,9 @@
 **/
 package press.gfw;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.StringReader;
 import java.net.Socket;
 import java.sql.Timestamp;
 
@@ -119,7 +116,6 @@ public class ClientThread extends PointThread {
 		OutputStream serverOut = null;
 
 		try {
-
 			// 连接服务器
 			serverSocket = new Socket(serverHost, serverPort);
 
@@ -137,11 +133,11 @@ public class ClientThread extends PointThread {
 
 			serverIn = serverSocket.getInputStream();
 			serverOut = serverSocket.getOutputStream();
-
+			Broadcast.sendBroadcast(Windows.BROADCAST_ACTION_NORMAL, null);
 		} catch (IOException ex) {
 
 			log("连接服务器出错：" + serverHost + ":" + serverPort);
-
+			Broadcast.sendBroadcast(Windows.BROADCAST_ACTION_ERROR, null);
 			over();
 
 			return;

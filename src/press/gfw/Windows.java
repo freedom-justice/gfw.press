@@ -33,6 +33,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.Arrays;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -53,7 +54,7 @@ import org.json.simple.JSONObject;
  * @author chinashiyu ( chinashiyu@gfw.press ; http://gfw.press )
  *
  */
-public class Windows extends JFrame {
+public class Windows extends JFrame implements IBroadcastCallback {
 
 	/**
 	 * 退出
@@ -73,6 +74,7 @@ public class Windows extends JFrame {
 				if (tray != null && icon != null) {
 					tray.remove(icon);
 				}
+				Broadcast.unRegister(Windows.BROADCAST_ACTION_ERROR,Windows.BROADCAST_ACTION_NORMAL);
 				System.exit(0);
 				break;
 
@@ -181,7 +183,7 @@ public class Windows extends JFrame {
 	public static void main(String[] args) throws IOException {
 
 		Windows windows = new Windows();
-
+		
 		windows.start();
 
 	}
@@ -212,13 +214,16 @@ public class Windows extends JFrame {
 
 	private JPasswordField passwordField = new JPasswordField(), loginPwdField = new JPasswordField();
 
+	public static final String BROADCAST_ACTION_ERROR = "gfw.press.error";
+	public static final String BROADCAST_ACTION_NORMAL = "gfw.press.normal";
+	
 	public Windows() {
 
 		super("GFW.Press");
 
 		config = new Config();
 
-		initTray();
+		initTray("logo.png");
 
 		initWindows();
 
@@ -227,6 +232,8 @@ public class Windows extends JFrame {
 		initButton();
 
 		initBorder();
+		
+		Broadcast.register(Arrays.asList(Windows.BROADCAST_ACTION_ERROR,Windows.BROADCAST_ACTION_NORMAL), this);
 
 		if (password.length() < 8) {
 
@@ -322,44 +329,28 @@ public class Windows extends JFrame {
 
 	}
 
-	private void initTray() {
-
-		logo = Toolkit.getDefaultToolkit().getImage("logo.png");
-
+	private void initTray(String iconName) {
+		logo = Toolkit.getDefaultToolkit().getImage(iconName);
 		setIconImage(logo);
-
-		if (!SystemTray.isSupported()) {
-
-			return;
-
-		}
-
 		icon = new TrayIcon(logo, null, null);
-
 		icon.setImageAutoSize(true);
-
 		icon.addActionListener(new TrayListener());
-
 		tray = SystemTray.getSystemTray();
-
 		try {
-
+			TrayIcon[] icons = tray.getTrayIcons();
+			for(TrayIcon i : icons)
+				tray.remove(i);
 			tray.add(icon);
-
 		} catch (AWTException ex) {
-
 			log("添加系统托盘图标出错：");
-
 			ex.printStackTrace();
-
 		}
-
 	}
-
+	
 	private void initWindows() {
 
 		Dimension dimemsion = Toolkit.getDefaultToolkit().getScreenSize();
-
+			
 		setSize(480, 300);
 
 		setLocation((int) (dimemsion.getWidth() - getWidth()) / 2, (int) (dimemsion.getHeight() - getHeight()) / 2);
@@ -516,6 +507,18 @@ public class Windows extends JFrame {
 
 		// log(client.getName());
 
+	}
+
+	private boolean isNormal = true;
+	@Override
+	public void recevier(String action, BroadcastData data) {
+		if(Windows.BROADCAST_ACTION_ERROR.equals(action) && isNormal){
+			initTray("logo_error.png");
+			isNormal = false;
+		}else if(Windows.BROADCAST_ACTION_NORMAL.equals(action) && !isNormal){
+			initTray("logo.png");
+			isNormal = true;
+		}
 	}
 
 }

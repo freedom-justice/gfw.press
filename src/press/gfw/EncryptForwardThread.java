@@ -34,7 +34,7 @@ import javax.crypto.SecretKey;
  */
 public class EncryptForwardThread extends Thread {
 
-	private static final int BUFFER_SIZE_MIN = 1024 * 4; // 缓冲区最小值，4K
+	private static final int BUFFER_SIZE_MIN = 1024 * 8; // 缓冲区最小值，4K
 
 	private static final int BUFFER_SIZE_MAX = 1024 * 128; // 缓冲区最大值，128K
 
