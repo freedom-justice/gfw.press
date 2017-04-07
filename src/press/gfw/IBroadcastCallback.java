@@ -11,6 +11,10 @@ public interface IBroadcastCallback {
 class BroadcastData{
 	private HashMap<String, Object> data = new HashMap<>();
 	
+	public BroadcastData(String key,Object val){
+		data.put(key, val);
+	}
+	
 	public BroadcastData putData(String key,Object val){
 		if(!data.containsKey(key))
 			data.put(key, val);

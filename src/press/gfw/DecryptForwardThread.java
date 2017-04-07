@@ -89,7 +89,6 @@ public class DecryptForwardThread extends Thread {
 	 * 解密转发
 	 */
 	public void run() {
-
 		byte[] buffer = null;
 		byte[] size_bytes = null;
 		int[] sizes = null;
@@ -133,13 +132,11 @@ public class DecryptForwardThread extends Thread {
 					break;
 				}
 				outputStream.write(decrypt_bytes);
-
 				outputStream.flush();
-
 			}
-
 		} catch (IOException ex) {
-
+			log("解密转发："+ex.getLocalizedMessage());
+			Broadcast.sendBroadcast(Windows.BROADCAST_ACTION_WARING, new BroadcastData("msg","解密数据失败！"));
 		}
 
 		buffer = null;

@@ -26,6 +26,8 @@ import java.sql.Timestamp;
 
 import javax.crypto.SecretKey;
 
+import com.sun.corba.se.impl.orbutil.threadpool.TimeoutException;
+
 /**
  * GFW.Press加密及转发线程
  * 
@@ -54,11 +56,11 @@ public class EncryptForwardThread extends Thread {
 	 * 构造方法
 	 * 
 	 * @param parent
-	 *          父线程
+	 *            父线程
 	 * @param inputStream
-	 *          输入流
+	 *            输入流
 	 * @param outputStream
-	 *          输出流
+	 *            输出流
 	 * 
 	 */
 	public EncryptForwardThread(PointThread parent, InputStream inputStream, OutputStream outputStream, SecretKey key) {
@@ -105,14 +107,16 @@ public class EncryptForwardThread extends Thread {
 					break; // 加密出错，退出
 				}
 				outputStream.write(encrypt_bytes);
+
 				outputStream.flush();
 				// 缓冲区过小，自动增大缓冲区
 				if (read_num == buffer.length && read_num < BUFFER_SIZE_MAX) { // 自动调整缓冲区大小
 					buffer = null;
 					buffer = new byte[read_num + BUFFER_SIZE_STEP];
 					// 缓冲区过大，自动增小缓冲区
-					
-				} else if (read_num < (buffer.length - BUFFER_SIZE_STEP) && (buffer.length - BUFFER_SIZE_STEP) >= BUFFER_SIZE_MIN) {
+
+				} else if (read_num < (buffer.length - BUFFER_SIZE_STEP)
+						&& (buffer.length - BUFFER_SIZE_STEP) >= BUFFER_SIZE_MIN) {
 					int len = buffer.length - BUFFER_SIZE_STEP;
 					buffer = null;
 					buffer = new byte[len];
@@ -120,7 +124,8 @@ public class EncryptForwardThread extends Thread {
 				}
 			}
 		} catch (IOException ex) {
-
+			log("加密发送："+ex.getLocalizedMessage());
+			Broadcast.sendBroadcast(Windows.BROADCAST_ACTION_WARING, new BroadcastData("msg", "加密发送失败！"));
 		}
 
 		buffer = null;

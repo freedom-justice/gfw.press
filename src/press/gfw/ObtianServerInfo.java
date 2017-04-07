@@ -47,17 +47,14 @@ public class ObtianServerInfo extends Thread {
 		if (null == loginName || "".equals(loginName) || null == loginPwd || "".equals(loginPwd))
 			return;
 		try {
-			JSONObject json = config.getJSON(getHtml("https://gfw.press/user/_login.php",
-					"email=" + loginName + "&passwd=" + loginPwd + "&remember_me=week", ""));
+			JSONObject json = config.getJSON(getHtml("https://gfw.press/user/_login.php", "email=" + loginName + "&passwd=" + loginPwd + "&remember_me=week", ""));
 			if (!"1".equals(json.get("code"))) {
 				config.log("登陆gfw.press失败。" + json.get("msg"));
-				javax.swing.JOptionPane.showMessageDialog(null, json.get("msg"), "GFW.Press",
-						javax.swing.JOptionPane.ERROR_MESSAGE);
+				javax.swing.JOptionPane.showMessageDialog(null, json.get("msg"), "GFW.Press", javax.swing.JOptionPane.ERROR_MESSAGE);
 				return;
 			}
-			config.log("成功获取服务器最新节点信息");
-			String html = getHtml("https://gfw.press/user/", null,
-					"uid=" + uid + ";user_email=" + user_email + ";user_pwd=" + user_pwd);
+			config.log("成功获最新节点信息");
+			String html = getHtml("https://gfw.press/user/", null, "uid=" + uid + ";user_email=" + user_email + ";user_pwd=" + user_pwd);
 			String[] nodes = null;
 			String port = "";
 			String pwd = "";
@@ -79,13 +76,12 @@ public class ObtianServerInfo extends Thread {
 			}
 			if (null == nodes || 0 == nodes.length || "".equals(port) || "".equals(pwd)) {
 				config.log("解析节点信息失败！");
-				javax.swing.JOptionPane.showMessageDialog(null, "解析节点信息失败！", "GFW.Press",
-						javax.swing.JOptionPane.ERROR_MESSAGE);
+				javax.swing.JOptionPane.showMessageDialog(null, "解析节点信息失败！", "GFW.Press", javax.swing.JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 			saveConfig(nodes, nodes[0], port, pwd);
 		} catch (Exception e) {
-			config.log(e.getLocalizedMessage());
+			config.log("获取节点错误！");
 			e.printStackTrace();
 		}
 	}
@@ -118,8 +114,7 @@ public class ObtianServerInfo extends Thread {
 			conn.addRequestProperty("Cookie", cookie);
 		conn.addRequestProperty("Host", "gfw.press");
 		conn.addRequestProperty("Referer", "https://gfw.press/user/login.php");
-		conn.addRequestProperty("User-Agent",
-				"Mozilla/5.0 (Windows NT 6.1; WOW64; rv:51.0) Gecko/20100101 Firefox/51.0");
+		conn.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:51.0) Gecko/20100101 Firefox/51.0");
 		conn.addRequestProperty("X-Requested-With", "XMLHttpRequest");
 		conn.setDoInput(true);
 		conn.setDoOutput(true);

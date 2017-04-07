@@ -133,11 +133,11 @@ public class ClientThread extends PointThread {
 
 			serverIn = serverSocket.getInputStream();
 			serverOut = serverSocket.getOutputStream();
-			Broadcast.sendBroadcast(Windows.BROADCAST_ACTION_NORMAL, null);
+			Broadcast.sendBroadcast(Windows.BROADCAST_ACTION_NORMAL, new BroadcastData("msg","翻墙成功！"));
 		} catch (IOException ex) {
 
 			log("连接服务器出错：" + serverHost + ":" + serverPort);
-			Broadcast.sendBroadcast(Windows.BROADCAST_ACTION_ERROR, null);
+			Broadcast.sendBroadcast(Windows.BROADCAST_ACTION_ERROR, new BroadcastData("msg","连接["+serverHost+":"+serverPort+"]失败！"));
 			over();
 
 			return;

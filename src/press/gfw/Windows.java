@@ -74,7 +74,7 @@ public class Windows extends JFrame implements IBroadcastCallback {
 				if (tray != null && icon != null) {
 					tray.remove(icon);
 				}
-				Broadcast.unRegister(Windows.BROADCAST_ACTION_ERROR,Windows.BROADCAST_ACTION_NORMAL);
+				Broadcast.unRegister(Windows.BROADCAST_ACTION_ERROR,Windows.BROADCAST_ACTION_NORMAL,Windows.BROADCAST_ACTION_WARING);
 				System.exit(0);
 				break;
 
@@ -216,6 +216,7 @@ public class Windows extends JFrame implements IBroadcastCallback {
 
 	public static final String BROADCAST_ACTION_ERROR = "gfw.press.error";
 	public static final String BROADCAST_ACTION_NORMAL = "gfw.press.normal";
+	public static final String BROADCAST_ACTION_WARING = "gfw.press.waring";
 	
 	public Windows() {
 
@@ -223,7 +224,7 @@ public class Windows extends JFrame implements IBroadcastCallback {
 
 		config = new Config();
 
-		initTray("logo.png");
+		initTray("logo.png","");
 
 		initWindows();
 
@@ -233,7 +234,7 @@ public class Windows extends JFrame implements IBroadcastCallback {
 
 		initBorder();
 		
-		Broadcast.register(Arrays.asList(Windows.BROADCAST_ACTION_ERROR,Windows.BROADCAST_ACTION_NORMAL), this);
+		Broadcast.register(Arrays.asList(Windows.BROADCAST_ACTION_ERROR,Windows.BROADCAST_ACTION_NORMAL,Windows.BROADCAST_ACTION_WARING), this);
 
 		if (password.length() < 8) {
 
@@ -329,10 +330,10 @@ public class Windows extends JFrame implements IBroadcastCallback {
 
 	}
 
-	private void initTray(String iconName) {
+	private void initTray(String iconName,String tip) {
 		logo = Toolkit.getDefaultToolkit().getImage(iconName);
 		setIconImage(logo);
-		icon = new TrayIcon(logo, null, null);
+		icon = new TrayIcon(logo, tip);
 		icon.setImageAutoSize(true);
 		icon.addActionListener(new TrayListener());
 		tray = SystemTray.getSystemTray();
@@ -509,16 +510,17 @@ public class Windows extends JFrame implements IBroadcastCallback {
 
 	}
 
-	private boolean isNormal = true;
+	private String state = null;
 	@Override
 	public void recevier(String action, BroadcastData data) {
-		if(Windows.BROADCAST_ACTION_ERROR.equals(action) && isNormal){
-			initTray("logo_error.png");
-			isNormal = false;
-		}else if(Windows.BROADCAST_ACTION_NORMAL.equals(action) && !isNormal){
-			initTray("logo.png");
-			isNormal = true;
+		if(Windows.BROADCAST_ACTION_ERROR.equals(action) && !Windows.BROADCAST_ACTION_ERROR.equals(state)){
+			initTray("logo_error.png",data.getData("msg")+"");
+		}else if(Windows.BROADCAST_ACTION_NORMAL.equals(action) && !Windows.BROADCAST_ACTION_NORMAL.equals(state)){
+			initTray("logo.png",data.getData("msg")+"");
+		}else if(Windows.BROADCAST_ACTION_WARING.equals(action)  && !Windows.BROADCAST_ACTION_WARING.equals(state)){
+			initTray("logo_waring.png",data.getData("msg")+"");
 		}
+		state = action;
 	}
 
 }
