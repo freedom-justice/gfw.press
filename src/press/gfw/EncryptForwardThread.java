@@ -100,6 +100,7 @@ public class EncryptForwardThread extends Thread {
 				if (read_num == -1) {
 					break;
 				}
+				read_bytes = null;
 				read_bytes = new byte[read_num];
 				System.arraycopy(buffer, 0, read_bytes, 0, read_num);
 				encrypt_bytes = aes.encryptNet(key, read_bytes);
@@ -107,7 +108,6 @@ public class EncryptForwardThread extends Thread {
 					break; // 加密出错，退出
 				}
 				outputStream.write(encrypt_bytes);
-
 				outputStream.flush();
 				// 缓冲区过小，自动增大缓冲区
 				if (read_num == buffer.length && read_num < BUFFER_SIZE_MAX) { // 自动调整缓冲区大小
@@ -115,8 +115,7 @@ public class EncryptForwardThread extends Thread {
 					buffer = new byte[read_num + BUFFER_SIZE_STEP];
 					// 缓冲区过大，自动增小缓冲区
 
-				} else if (read_num < (buffer.length - BUFFER_SIZE_STEP)
-						&& (buffer.length - BUFFER_SIZE_STEP) >= BUFFER_SIZE_MIN) {
+				} else if (read_num < (buffer.length - BUFFER_SIZE_STEP) && (buffer.length - BUFFER_SIZE_STEP) >= BUFFER_SIZE_MIN) {
 					int len = buffer.length - BUFFER_SIZE_STEP;
 					buffer = null;
 					buffer = new byte[len];
@@ -124,8 +123,7 @@ public class EncryptForwardThread extends Thread {
 				}
 			}
 		} catch (IOException ex) {
-			log("加密发送："+ex.getLocalizedMessage());
-			Broadcast.sendBroadcast(Windows.BROADCAST_ACTION_WARING, new BroadcastData("msg", "加密发送失败！"));
+//			Broadcast.sendBroadcast(Windows.BROADCAST_ACTION_WARING, new BroadcastData("msg", "加密发送失败！"));
 		}
 
 		buffer = null;

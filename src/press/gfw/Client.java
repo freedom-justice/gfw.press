@@ -241,7 +241,6 @@ public class Client extends Thread {
 			try {
 
 				agentSocket = listenSocket.accept();
-
 			} catch (IOException ex) {
 
 				if (listenSocket != null && !listenSocket.isClosed()) {

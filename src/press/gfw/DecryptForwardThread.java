@@ -22,6 +22,7 @@ package press.gfw;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.SocketException;
 import java.sql.Timestamp;
 
 import javax.crypto.SecretKey;
@@ -95,6 +96,7 @@ public class DecryptForwardThread extends Thread {
 		byte[] decrypt_bytes = null;
 		try {
 			while (true) {
+				buffer = null;
 				buffer = new byte[Encrypt.ENCRYPT_SIZE];
 				int read_num = inputStream.read(buffer);
 				if (read_num == -1 || read_num != Encrypt.ENCRYPT_SIZE) {
@@ -135,8 +137,7 @@ public class DecryptForwardThread extends Thread {
 				outputStream.flush();
 			}
 		} catch (IOException ex) {
-			log("解密转发："+ex.getLocalizedMessage());
-			Broadcast.sendBroadcast(Windows.BROADCAST_ACTION_WARING, new BroadcastData("msg","解密数据失败！"));
+//			Broadcast.sendBroadcast(Windows.BROADCAST_ACTION_WARING, new BroadcastData("msg","解密数据失败！"));
 		}
 
 		buffer = null;

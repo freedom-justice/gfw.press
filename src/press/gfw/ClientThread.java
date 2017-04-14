@@ -154,4 +154,14 @@ public class ClientThread extends PointThread {
 
 	}
 
+	public Socket getAgentSocket() {
+		return agentSocket;
+	}
+
+	public Socket getServerSocket() {
+		return serverSocket;
+	}
+	
+	
+
 }
