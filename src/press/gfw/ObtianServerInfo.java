@@ -81,8 +81,7 @@ public class ObtianServerInfo extends Thread {
 			}
 			saveConfig(nodes, nodes[0], port, pwd);
 		} catch (Exception e) {
-			config.log("获取节点错误！");
-			e.printStackTrace();
+			config.log("获取节点错误！"+e.getLocalizedMessage());
 		}
 	}
 
