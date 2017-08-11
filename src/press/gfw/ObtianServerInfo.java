@@ -1,15 +1,13 @@
 package press.gfw;
 
-import java.awt.image.DataBufferUShort;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -58,19 +56,31 @@ public class ObtianServerInfo extends Thread {
 			String[] nodes = null;
 			String port = "";
 			String pwd = "";
-			Pattern p = Pattern.compile("<p>([^<]*)</p>");
+			Pattern p = Pattern.compile("<td>([^<]*)</td>");
 			Matcher m = p.matcher(html);
 			while (m.find()) {
 				String group = m.group(1);
 				if (group.contains("节点")) {
-					group = group.substring(4);
-					nodes = group.replaceAll("\\s+", "").split("或");
+					List<String> nodeList = new ArrayList<String>();
+					while(m.find()){
+						group = m.group(1);
+						if(group.matches("^[\\d+\\.]+\\d+$"))
+							nodeList.add(group.trim());
+						if(group.contains("端口")){
+							nodes = nodeList.toArray(new String[]{});
+							break;
+						}
+					}
 				}
 				if (group.contains("端口")) {
-					port = group.substring(4).trim();
+					m.find();
+					group = m.group(1);
+					port = group.trim();
 				}
 				if (group.contains("密码")) {
-					pwd = group.substring(4).trim();
+					m.find();
+					group = m.group(1);
+					pwd = group.trim();
 					break;
 				}
 			}
