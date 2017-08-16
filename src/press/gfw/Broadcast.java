@@ -49,6 +49,10 @@ public class Broadcast {
 			return ;
 		for(String action : actions){
 			List<IBroadcastCallback> list = dataList.get(action);
+			if(null == list || 0 == list.size()){
+				System.out.println("没有找到对应的广播action:"+action);
+				return ;
+			}
 			for(IBroadcastCallback callback : list){
 				SwingUtilities.invokeLater(new Runnable(){
 					@Override

@@ -22,6 +22,7 @@ package press.gfw;
 import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.SystemTray;
@@ -29,13 +30,21 @@ import java.awt.Toolkit;
 import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.sql.Timestamp;
 import java.util.Arrays;
+import java.util.Hashtable;
 
+import javax.imageio.ImageIO;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -43,9 +52,16 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
 
 /**
  * 
@@ -74,7 +90,8 @@ public class Windows extends JFrame implements IBroadcastCallback {
 				if (tray != null && icon != null) {
 					tray.remove(icon);
 				}
-				Broadcast.unRegister(Windows.BROADCAST_ACTION_ERROR,Windows.BROADCAST_ACTION_NORMAL,Windows.BROADCAST_ACTION_WARING);
+				Broadcast.unRegister(Windows.BROADCAST_ACTION_ERROR, Windows.BROADCAST_ACTION_NORMAL,
+						Windows.BROADCAST_ACTION_WARING, Windows.BROADCAST_ACTION_QRCODE);
 				System.exit(0);
 				break;
 
@@ -123,67 +140,12 @@ public class Windows extends JFrame implements IBroadcastCallback {
 		}
 	}
 
-	/**
-	 * 系统托盘
-	 */
-	private class TrayListener implements ActionListener {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			toFront();
-			setVisible(true);
-		}
-	}
-
-	/**
-	 * 主窗口
-	 */
-	private class WindowsListener implements WindowListener {
-
-		@Override
-		public void windowActivated(WindowEvent e) {
-
-		}
-
-		@Override
-		public void windowClosed(WindowEvent e) {
-
-		}
-
-		@Override
-		public void windowClosing(WindowEvent e) {
-
-			setVisible(false);
-
-		}
-
-		@Override
-		public void windowDeactivated(WindowEvent e) {
-
-		}
-
-		@Override
-		public void windowDeiconified(WindowEvent e) {
-
-		}
-
-		@Override
-		public void windowIconified(WindowEvent e) {
-
-		}
-
-		@Override
-		public void windowOpened(WindowEvent e) {
-
-		}
-
-	}
-
 	private static final long serialVersionUID = -7964262019916663094L;
 
 	public static void main(String[] args) throws IOException {
 
 		Windows windows = new Windows();
-		
+
 		windows.start();
 
 	}
@@ -210,21 +172,25 @@ public class Windows extends JFrame implements IBroadcastCallback {
 
 	private JComboBox serverHostField = new JComboBox();
 
-	private JTextField serverPortField = new JTextField(), proxyPortField = new JTextField(), loginNameField = new JTextField();
+	private JTextField serverPortField = new JTextField(), proxyPortField = new JTextField(),
+			loginNameField = new JTextField();
 
 	private JPasswordField passwordField = new JPasswordField(), loginPwdField = new JPasswordField();
+
+	private JLabel qrCoder = new JLabel();
 
 	public static final String BROADCAST_ACTION_ERROR = "gfw.press.error";
 	public static final String BROADCAST_ACTION_NORMAL = "gfw.press.normal";
 	public static final String BROADCAST_ACTION_WARING = "gfw.press.waring";
-	
+	public static final String BROADCAST_ACTION_QRCODE = "gfw.press.qrcode";
+
 	public Windows() {
 
 		super("GFW.Press");
 
 		config = new Config();
 
-		initTray("logo.png","");
+		initTray("img/logo.png", "");
 
 		initWindows();
 
@@ -233,8 +199,9 @@ public class Windows extends JFrame implements IBroadcastCallback {
 		initButton();
 
 		initBorder();
-		
-		Broadcast.register(Arrays.asList(Windows.BROADCAST_ACTION_ERROR,Windows.BROADCAST_ACTION_NORMAL,Windows.BROADCAST_ACTION_WARING), this);
+
+		Broadcast.register(Arrays.asList(Windows.BROADCAST_ACTION_ERROR, Windows.BROADCAST_ACTION_NORMAL,
+				Windows.BROADCAST_ACTION_WARING, Windows.BROADCAST_ACTION_QRCODE), this);
 
 		if (password.length() < 8) {
 
@@ -292,10 +259,13 @@ public class Windows extends JFrame implements IBroadcastCallback {
 
 	private void initForm() {
 
+		// 主面板
+		JPanel mainPanel = new JPanel();
+		mainPanel.setLayout(new FlowLayout());
 		// 服务面板
 		JPanel serverPanel = new JPanel();
 
-		GridLayout serverLayout = new GridLayout(6, 2, 0, 5);
+		GridLayout serverLayout = new GridLayout(6, 3, 0, 5);
 
 		serverPanel.setLayout(serverLayout);
 		// 帐号信息
@@ -312,6 +282,54 @@ public class Windows extends JFrame implements IBroadcastCallback {
 
 		serverPanel.add(serverHostField);
 
+		serverHostField.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				qrCoder.setIcon(null);
+				qrCoder.setIcon(new ImageIcon("img/loading.gif"));
+				new Thread(new Runnable() {
+					public void run() {
+						try {
+							int width = 100;
+							int height = 100;
+							String serverNode = (String) serverHostField.getSelectedItem();
+							String base64 = encodeBase64(
+									("aes-256-cfb:" + password + "@" + serverNode + ":" + serverPort).getBytes());
+							base64 = "gp://" + base64 + "?remarks=gfw.press";
+							Hashtable<EncodeHintType, String> hints = new Hashtable<EncodeHintType, String>();
+							hints.put(EncodeHintType.CHARACTER_SET, "GBK");
+							BitMatrix matrix = null;
+							try {
+								matrix = new MultiFormatWriter().encode(base64, BarcodeFormat.QR_CODE, width, height,
+										hints);
+							} catch (WriterException ee) {
+								ee.printStackTrace();
+							}
+							ByteArrayOutputStream out = new ByteArrayOutputStream();
+							int _width = matrix.getWidth();
+							int _height = matrix.getHeight();
+							BufferedImage image = new BufferedImage(_width, _height, BufferedImage.TYPE_INT_RGB);
+							for (int x = 0; x < width; x++) {
+								for (int y = 0; y < height; y++) {
+									image.setRGB(x, y, matrix.get(x, y) ? 0xFF000000 : 0xFFFFFFFF);
+								}
+							}
+							ImageIO.write(image, "png", out);
+							BroadcastData data = new BroadcastData("qrCode", out.toByteArray());
+							data.putData("result", "success");
+							Broadcast.sendBroadcast(Windows.BROADCAST_ACTION_QRCODE, data);
+							out.close();
+						} catch (Exception ee) {
+							ee.printStackTrace();
+							BroadcastData data = new BroadcastData("result", "fail");
+							Broadcast.sendBroadcast(Windows.BROADCAST_ACTION_QRCODE, data);
+						}
+					}
+				}).start();
+
+			}
+		});
+
 		serverPanel.add(new JLabel("节点端口："));
 
 		serverPanel.add(serverPortField);
@@ -324,22 +342,37 @@ public class Windows extends JFrame implements IBroadcastCallback {
 
 		serverPanel.add(proxyPortField);
 
+		mainPanel.add(serverPanel);
+
+		mainPanel.add(qrCoder);
+
+		qrCoder.setHorizontalTextPosition(SwingConstants.CENTER);
+		qrCoder.setHorizontalAlignment(SwingConstants.CENTER);
+		qrCoder.setVerticalAlignment(SwingConstants.CENTER);
+		qrCoder.setVerticalTextPosition(SwingConstants.BOTTOM);
+
 		loadConfig();
 
-		add(serverPanel, BorderLayout.CENTER);
+		add(mainPanel, BorderLayout.CENTER);
 
 	}
 
-	private void initTray(String iconName,String tip) {
+	private void initTray(String iconName, String tip) {
 		logo = Toolkit.getDefaultToolkit().getImage(iconName);
 		setIconImage(logo);
 		icon = new TrayIcon(logo, tip);
 		icon.setImageAutoSize(true);
-		icon.addActionListener(new TrayListener());
+		icon.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				toFront();
+				setVisible(true);
+			}
+		});
 		tray = SystemTray.getSystemTray();
 		try {
 			TrayIcon[] icons = tray.getTrayIcons();
-			for(TrayIcon i : icons)
+			for (TrayIcon i : icons)
 				tray.remove(i);
 			tray.add(icon);
 		} catch (AWTException ex) {
@@ -347,20 +380,25 @@ public class Windows extends JFrame implements IBroadcastCallback {
 			ex.printStackTrace();
 		}
 	}
-	
+
 	private void initWindows() {
 
 		Dimension dimemsion = Toolkit.getDefaultToolkit().getScreenSize();
-			
-		setSize(480, 300);
+
+		setSize(520, 310);
 
 		setLocation((int) (dimemsion.getWidth() - getWidth()) / 2, (int) (dimemsion.getHeight() - getHeight()) / 2);
 
 		// setAlwaysOnTop(true);
 
-		setResizable(false);
+		// setResizable(false);
 
-		addWindowListener(new WindowsListener());
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				setVisible(false);
+			}
+		});
 
 		// 主窗口布局
 		BorderLayout windowsLayout = new BorderLayout(20, 20);
@@ -410,11 +448,10 @@ public class Windows extends JFrame implements IBroadcastCallback {
 		for (int i = 0; i < nodes.length; i++) {
 			serverHosts[i] = nodes[i] + "";
 		}
-
 		serverHostField.setModel(new DefaultComboBoxModel<Object>(nodes));
-
+		serverHostField.setRenderer(new NodeRender());
+		serverHostField.setSelectedIndex(-1);
 		serverHostField.setSelectedItem(serverHost);
-
 		serverHostField.updateUI();
 
 		serverPortField.setText(serverPort);
@@ -510,15 +547,39 @@ public class Windows extends JFrame implements IBroadcastCallback {
 
 	}
 
+	/***
+	 * encode by Base64
+	 */
+	public static String encodeBase64(byte[] input) throws Exception {
+		Class clazz = Class.forName("com.sun.org.apache.xerces.internal.impl.dv.util.Base64");
+		Method mainMethod = clazz.getMethod("encode", byte[].class);
+		mainMethod.setAccessible(true);
+		Object retObj = mainMethod.invoke(null, new Object[] { input });
+		return (String) retObj;
+	}
+
 	private String state = null;
+
 	@Override
 	public void recevier(String action, BroadcastData data) {
-		if(Windows.BROADCAST_ACTION_ERROR.equals(action) && !Windows.BROADCAST_ACTION_ERROR.equals(state)){
-			initTray("logo_error.png",data.getData("msg")+"");
-		}else if(Windows.BROADCAST_ACTION_NORMAL.equals(action) && !Windows.BROADCAST_ACTION_NORMAL.equals(state)){
-			initTray("logo.png",data.getData("msg")+"");
-		}else if(Windows.BROADCAST_ACTION_WARING.equals(action)  && !Windows.BROADCAST_ACTION_WARING.equals(state)){
-			initTray("logo_waring.png",data.getData("msg")+"");
+		if (Windows.BROADCAST_ACTION_ERROR.equals(action) && !Windows.BROADCAST_ACTION_ERROR.equals(state)) {
+			initTray("img/logo_error.png", data.getData("msg") + "");
+		} else if (Windows.BROADCAST_ACTION_NORMAL.equals(action) && !Windows.BROADCAST_ACTION_NORMAL.equals(state)) {
+			initTray("img/logo.png", data.getData("msg") + "");
+		} else if (Windows.BROADCAST_ACTION_WARING.equals(action) && !Windows.BROADCAST_ACTION_WARING.equals(state)) {
+			initTray("img/logo_waring.png", data.getData("msg") + "");
+		}
+		if (Windows.BROADCAST_ACTION_QRCODE.equals(action)) {
+			if ("success".equalsIgnoreCase(data.getData("result") + "")) {
+				byte[] bytes = (byte[]) data.getData("qrCode");
+				qrCoder.setIcon(new ImageIcon(bytes));
+				qrCoder.setText("请使用小火箭扫描");
+			} else {
+				qrCoder.setIcon(new ImageIcon("img/rupture.png"));
+				qrCoder.setText("二维码生成失败");
+			}
+			qrCoder.updateUI();
+			return;
 		}
 		state = action;
 	}
