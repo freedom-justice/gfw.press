@@ -12,12 +12,17 @@
 
 > 1.将本程序的[bin]目录覆盖官方版本bin目录<br/>
 > 2.找一份已覆盖了[jce_policy-8.zip]文件的jdk8的jre覆盖官方jre目录<br/>
-> 3.将[config.json]文件放到官方根目录<br/>
-> 4.将图标[logo_error.png]文件放到官方根目录<br/>
-> 最后当然你也可以直接解压[GFW.Press免安装运行版.zip]然后双击666运行。或者在[GFW.Press免安装运行版.zip]中完成1,2,3,4步<br/>
+> 3.将[lib]目录覆盖官方lib目录<br/>
+> 4.将[config.json]文件放到官方根目录<br/>
+> 5.将[img]文件夹解压到官方根目录<br/>
+> 最后当然你也可以直接解压[GFW.Press免安装运行版.zip]然后双击666运行。或者在[GFW.Press免安装运行版.zip]中完成上述步奏<br/>
 
 
 ### 运行截图
 
 >![运行截图1](https://github.com/lyx32/gfw.press/blob/master/images/1.png)<br/>
->![运行截图2](https://github.com/lyx32/gfw.press/blob/master/images/2.png)
+>![运行截图2](https://github.com/lyx32/gfw.press/blob/master/images/2.png)<br/>
+
+
+
+<font color=#ffffff size=0 >更新于 2017-8-16</font> 
