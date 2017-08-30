@@ -449,7 +449,7 @@ public class Windows extends JFrame implements IBroadcastCallback {
 			serverHosts[i] = nodes[i] + "";
 		}
 		serverHostField.setModel(new DefaultComboBoxModel<Object>(nodes));
-		serverHostField.setRenderer(new NodeRender());
+		serverHostField.setRenderer(new NodeRender(serverHosts));
 		serverHostField.setSelectedIndex(-1);
 		serverHostField.setSelectedItem(serverHost);
 		serverHostField.updateUI();

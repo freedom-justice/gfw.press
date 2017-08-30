@@ -22,7 +22,9 @@
 
 >![运行截图1](https://github.com/lyx32/gfw.press/blob/master/images/1.png)<br/>
 >![运行截图2](https://github.com/lyx32/gfw.press/blob/master/images/2.png)<br/>
+>![运行截图3](https://github.com/lyx32/gfw.press/blob/master/images/3.png)<br/>
 
 
 
+<font color=#ffffff size=0 >更新于 2017-8-30</font> 
 <font color=#ffffff size=0 >更新于 2017-8-16</font> 
