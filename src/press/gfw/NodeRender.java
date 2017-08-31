@@ -64,6 +64,9 @@ public class NodeRender extends JPanel implements ListCellRenderer<String> {
 	}
 
 	private String getNodeCountry(String ip) throws Exception {
+		if(!ip.matches("^[\\d+\\.]+\\d+$")){
+			ip = ip.replaceFirst("([\\d+\\.]+\\d+).*", "$1");
+		}
 		String url = "http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=json&ip=" + ip;
 		HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
 		conn.setReadTimeout(30000);

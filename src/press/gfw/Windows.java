@@ -23,7 +23,8 @@ import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.GridLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.SystemTray;
 import java.awt.Toolkit;
@@ -261,27 +262,50 @@ public class Windows extends JFrame implements IBroadcastCallback {
 
 		// 主面板
 		JPanel mainPanel = new JPanel();
-		mainPanel.setLayout(new FlowLayout());
+		mainPanel.setLayout(new FlowLayout(FlowLayout.LEFT,5,5));
 		// 服务面板
 		JPanel serverPanel = new JPanel();
-
-		GridLayout serverLayout = new GridLayout(6, 3, 0, 5);
-
-		serverPanel.setLayout(serverLayout);
+		GridBagLayout layout = new GridBagLayout();
+		serverPanel.setLayout(layout);
+		GridBagConstraints s= new GridBagConstraints();//定义一个GridBagConstraints， 
+        //是用来控制添加进的组件的显示位置 
+        s.fill = GridBagConstraints.BOTH; 
 		// 帐号信息
-		serverPanel.add(new JLabel("登录帐号："));
-
+        s.gridwidth=1;
+        s.weightx=0;
+        s.weighty=3;
+        JLabel lab = null;
+		serverPanel.add(lab = new JLabel("登录帐号："));
+		lab.setPreferredSize(new Dimension(80,26));
+		layout.setConstraints(lab, s);
+        s.gridwidth=0;
+        s.weightx=0;
+        s.weighty=3;
 		serverPanel.add(loginNameField);
-
-		serverPanel.add(new JLabel("登录密码："));
-
+		layout.setConstraints(loginNameField, s);
+        s.gridwidth=1;
+        s.weightx=0;
+        s.weighty=3;
+		serverPanel.add(lab = new JLabel("登录密码："));
+		lab.setPreferredSize(new Dimension(80,26));
+		layout.setConstraints(lab, s);
+		s.gridwidth=0;
+        s.weightx=0;
+        s.weighty=3;
 		serverPanel.add(loginPwdField);
+		layout.setConstraints(loginPwdField, s);
 		// 服务信息
-
-		serverPanel.add(new JLabel("节点地址："));
-
+        s.gridwidth=1;
+        s.weightx=0;
+        s.weighty=3;
+		serverPanel.add(lab = new JLabel("节点地址："));
+		lab.setPreferredSize(new Dimension(80,26));
+		layout.setConstraints(lab, s);
+		s.gridwidth=0;
+        s.weightx=0;
+        s.weighty=3;
 		serverPanel.add(serverHostField);
-
+		layout.setConstraints(serverHostField, s);
 		serverHostField.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
@@ -293,6 +317,9 @@ public class Windows extends JFrame implements IBroadcastCallback {
 							int width = 100;
 							int height = 100;
 							String serverNode = (String) serverHostField.getSelectedItem();
+							if(!serverNode.matches("^[\\d+\\.]+\\d+$")){
+								serverNode = serverNode.replaceFirst("([\\d+\\.]+\\d+).*", "$1");
+							}
 							String base64 = encodeBase64(
 									("aes-256-cfb:" + password + "@" + serverNode + ":" + serverPort).getBytes());
 							base64 = "gp://" + base64 + "?remarks=gfw.press";
@@ -329,21 +356,41 @@ public class Windows extends JFrame implements IBroadcastCallback {
 
 			}
 		});
-
-		serverPanel.add(new JLabel("节点端口："));
-
+        s.gridwidth=1;
+        s.weightx=0;
+        s.weighty=3;
+		serverPanel.add(lab = new JLabel("节点端口："));
+		lab.setPreferredSize(new Dimension(80,26));
+		layout.setConstraints(lab, s);
+		s.gridwidth=0;
+        s.weightx=0;
+        s.weighty=3;
 		serverPanel.add(serverPortField);
-
-		serverPanel.add(new JLabel("连接密码："));
-
+		layout.setConstraints(serverPortField, s);
+        s.gridwidth=1;
+        s.weightx=0;
+        s.weighty=3;
+		serverPanel.add(lab = new JLabel("连接密码："));
+		lab.setPreferredSize(new Dimension(80,26));
+		layout.setConstraints(lab, s);
+		s.gridwidth=0;
+        s.weightx=0;
+        s.weighty=3;
 		serverPanel.add(passwordField);
-
-		serverPanel.add(new JLabel("本地端口："));
-
+		layout.setConstraints(passwordField, s);
+        s.gridwidth=1;
+        s.weightx=0;
+        s.weighty=3;
+		serverPanel.add(lab = new JLabel("本地端口："));
+		lab.setPreferredSize(new Dimension(80,26));
+		layout.setConstraints(lab, s);
+		s.gridwidth=0;
+        s.weightx=0;
+        s.weighty=3;
 		serverPanel.add(proxyPortField);
-
+		layout.setConstraints(proxyPortField, s);
+		
 		mainPanel.add(serverPanel);
-
 		mainPanel.add(qrCoder);
 
 		qrCoder.setHorizontalTextPosition(SwingConstants.CENTER);
@@ -385,13 +432,13 @@ public class Windows extends JFrame implements IBroadcastCallback {
 
 		Dimension dimemsion = Toolkit.getDefaultToolkit().getScreenSize();
 
-		setSize(520, 310);
+		setSize(470, 310);
 
 		setLocation((int) (dimemsion.getWidth() - getWidth()) / 2, (int) (dimemsion.getHeight() - getHeight()) / 2);
 
-		// setAlwaysOnTop(true);
+		 setAlwaysOnTop(true);
 
-		// setResizable(false);
+		 setResizable(false);
 
 		addWindowListener(new WindowAdapter() {
 			@Override

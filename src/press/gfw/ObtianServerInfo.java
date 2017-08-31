@@ -64,8 +64,9 @@ public class ObtianServerInfo extends Thread {
 					List<String> nodeList = new ArrayList<String>();
 					while(m.find()){
 						group = m.group(1);
-						if(group.matches("^[\\d+\\.]+\\d+$"))
+						if(group.matches("^[\\d+\\.]+\\d+.*")){
 							nodeList.add(group.trim());
+						}
 						if(group.contains("端口")){
 							nodes = nodeList.toArray(new String[]{});
 							break;
