@@ -132,7 +132,7 @@ public class Windows extends JFrame implements IBroadcastCallback {
 				break;
 			case "取消":
 				setVisible(false);
-				serverHostField.setSelectedIndex(0);
+				serverHostField.setSelectedItem(serverHost);
 				serverPortField.setText(serverPort);
 				passwordField.setText(password);
 				proxyPortField.setText(proxyPort);
