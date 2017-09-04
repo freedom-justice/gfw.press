@@ -58,6 +58,9 @@ public class ClientThread extends PointThread {
 
 		this.key = key;
 
+		if(!serverHost.matches("^[\\d+\\.]+\\d+$")){
+			this.serverHost = serverHost.replaceFirst("([\\d+\\.]+\\d+).*", "$1");
+		}
 	}
 
 	/**

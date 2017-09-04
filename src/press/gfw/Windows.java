@@ -317,6 +317,8 @@ public class Windows extends JFrame implements IBroadcastCallback {
 							int width = 100;
 							int height = 100;
 							String serverNode = (String) serverHostField.getSelectedItem();
+							if(null == serverNode || "".equals(serverNode))
+								return ;
 							if(!serverNode.matches("^[\\d+\\.]+\\d+$")){
 								serverNode = serverNode.replaceFirst("([\\d+\\.]+\\d+).*", "$1");
 							}
