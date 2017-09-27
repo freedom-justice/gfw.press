@@ -151,7 +151,6 @@ public class Client extends Thread {
 		kill = true;
 
 		if (listenSocket != null && !listenSocket.isClosed()) {
-
 			try {
 
 				listenSocket.close();

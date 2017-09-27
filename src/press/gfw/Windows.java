@@ -262,48 +262,48 @@ public class Windows extends JFrame implements IBroadcastCallback {
 
 		// 主面板
 		JPanel mainPanel = new JPanel();
-		mainPanel.setLayout(new FlowLayout(FlowLayout.LEFT,5,5));
+		mainPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
 		// 服务面板
 		JPanel serverPanel = new JPanel();
 		GridBagLayout layout = new GridBagLayout();
 		serverPanel.setLayout(layout);
-		GridBagConstraints s= new GridBagConstraints();//定义一个GridBagConstraints， 
-        //是用来控制添加进的组件的显示位置 
-        s.fill = GridBagConstraints.BOTH; 
+		GridBagConstraints s = new GridBagConstraints();// 定义一个GridBagConstraints，
+		// 是用来控制添加进的组件的显示位置
+		s.fill = GridBagConstraints.BOTH;
 		// 帐号信息
-        s.gridwidth=1;
-        s.weightx=0;
-        s.weighty=3;
-        JLabel lab = null;
+		s.gridwidth = 1;
+		s.weightx = 0;
+		s.weighty = 3;
+		JLabel lab = null;
 		serverPanel.add(lab = new JLabel("登录帐号："));
-		lab.setPreferredSize(new Dimension(80,26));
+		lab.setPreferredSize(new Dimension(80, 26));
 		layout.setConstraints(lab, s);
-        s.gridwidth=0;
-        s.weightx=0;
-        s.weighty=3;
+		s.gridwidth = 0;
+		s.weightx = 0;
+		s.weighty = 3;
 		serverPanel.add(loginNameField);
 		layout.setConstraints(loginNameField, s);
-        s.gridwidth=1;
-        s.weightx=0;
-        s.weighty=3;
+		s.gridwidth = 1;
+		s.weightx = 0;
+		s.weighty = 3;
 		serverPanel.add(lab = new JLabel("登录密码："));
-		lab.setPreferredSize(new Dimension(80,26));
+		lab.setPreferredSize(new Dimension(80, 26));
 		layout.setConstraints(lab, s);
-		s.gridwidth=0;
-        s.weightx=0;
-        s.weighty=3;
+		s.gridwidth = 0;
+		s.weightx = 0;
+		s.weighty = 3;
 		serverPanel.add(loginPwdField);
 		layout.setConstraints(loginPwdField, s);
 		// 服务信息
-        s.gridwidth=1;
-        s.weightx=0;
-        s.weighty=3;
+		s.gridwidth = 1;
+		s.weightx = 0;
+		s.weighty = 3;
 		serverPanel.add(lab = new JLabel("节点地址："));
-		lab.setPreferredSize(new Dimension(80,26));
+		lab.setPreferredSize(new Dimension(80, 26));
 		layout.setConstraints(lab, s);
-		s.gridwidth=0;
-        s.weightx=0;
-        s.weighty=3;
+		s.gridwidth = 0;
+		s.weightx = 0;
+		s.weighty = 3;
 		serverPanel.add(serverHostField);
 		layout.setConstraints(serverHostField, s);
 		serverHostField.addItemListener(new ItemListener() {
@@ -317,9 +317,9 @@ public class Windows extends JFrame implements IBroadcastCallback {
 							int width = 100;
 							int height = 100;
 							String serverNode = (String) serverHostField.getSelectedItem();
-							if(null == serverNode || "".equals(serverNode))
-								return ;
-							if(!serverNode.matches("^[\\d+\\.]+\\d+$")){
+							if (null == serverNode || "".equals(serverNode))
+								return;
+							if (!serverNode.matches("^[\\d+\\.]+\\d+$")) {
 								serverNode = serverNode.replaceFirst("([\\d+\\.]+\\d+).*", "$1");
 							}
 							String base64 = encodeBase64(
@@ -358,40 +358,40 @@ public class Windows extends JFrame implements IBroadcastCallback {
 
 			}
 		});
-        s.gridwidth=1;
-        s.weightx=0;
-        s.weighty=3;
+		s.gridwidth = 1;
+		s.weightx = 0;
+		s.weighty = 3;
 		serverPanel.add(lab = new JLabel("节点端口："));
-		lab.setPreferredSize(new Dimension(80,26));
+		lab.setPreferredSize(new Dimension(80, 26));
 		layout.setConstraints(lab, s);
-		s.gridwidth=0;
-        s.weightx=0;
-        s.weighty=3;
+		s.gridwidth = 0;
+		s.weightx = 0;
+		s.weighty = 3;
 		serverPanel.add(serverPortField);
 		layout.setConstraints(serverPortField, s);
-        s.gridwidth=1;
-        s.weightx=0;
-        s.weighty=3;
+		s.gridwidth = 1;
+		s.weightx = 0;
+		s.weighty = 3;
 		serverPanel.add(lab = new JLabel("连接密码："));
-		lab.setPreferredSize(new Dimension(80,26));
+		lab.setPreferredSize(new Dimension(80, 26));
 		layout.setConstraints(lab, s);
-		s.gridwidth=0;
-        s.weightx=0;
-        s.weighty=3;
+		s.gridwidth = 0;
+		s.weightx = 0;
+		s.weighty = 3;
 		serverPanel.add(passwordField);
 		layout.setConstraints(passwordField, s);
-        s.gridwidth=1;
-        s.weightx=0;
-        s.weighty=3;
+		s.gridwidth = 1;
+		s.weightx = 0;
+		s.weighty = 3;
 		serverPanel.add(lab = new JLabel("本地端口："));
-		lab.setPreferredSize(new Dimension(80,26));
+		lab.setPreferredSize(new Dimension(80, 26));
 		layout.setConstraints(lab, s);
-		s.gridwidth=0;
-        s.weightx=0;
-        s.weighty=3;
+		s.gridwidth = 0;
+		s.weightx = 0;
+		s.weighty = 3;
 		serverPanel.add(proxyPortField);
 		layout.setConstraints(proxyPortField, s);
-		
+
 		mainPanel.add(serverPanel);
 		mainPanel.add(qrCoder);
 
@@ -438,9 +438,9 @@ public class Windows extends JFrame implements IBroadcastCallback {
 
 		setLocation((int) (dimemsion.getWidth() - getWidth()) / 2, (int) (dimemsion.getHeight() - getHeight()) / 2);
 
-		 setAlwaysOnTop(true);
+		setAlwaysOnTop(true);
 
-		 setResizable(false);
+		setResizable(false);
 
 		addWindowListener(new WindowAdapter() {
 			@Override
@@ -493,14 +493,15 @@ public class Windows extends JFrame implements IBroadcastCallback {
 		Object[] nodes = array.toArray();
 
 		serverHosts = new String[nodes.length];
-
+		int oldNodeIndex = 0;
 		for (int i = 0; i < nodes.length; i++) {
 			serverHosts[i] = nodes[i] + "";
+			if (serverHosts[i].startsWith(serverHost))
+				oldNodeIndex = i;
 		}
 		serverHostField.setModel(new DefaultComboBoxModel<Object>(nodes));
 		serverHostField.setRenderer(new NodeRender(serverHosts));
-		serverHostField.setSelectedIndex(-1);
-		serverHostField.setSelectedItem(serverHost);
+		serverHostField.setSelectedIndex(oldNodeIndex);
 		serverHostField.updateUI();
 
 		serverPortField.setText(serverPort);
@@ -551,6 +552,7 @@ public class Windows extends JFrame implements IBroadcastCallback {
 			@Override
 			public void dataUpdate(String[] nodes, String port, String pwd) {
 				boolean isUpdate = false;
+				boolean isNewNode = false;
 				if (!port.equals(serverPort)) {
 					serverPort = port;
 					isUpdate = true;
@@ -559,10 +561,25 @@ public class Windows extends JFrame implements IBroadcastCallback {
 					password = pwd;
 					isUpdate = true;
 				}
-				for (int i = 0; i < nodes.length; i++) {
-					if (!nodes[i].equals(serverHosts[i])) {
-						isUpdate = true;
-						break;
+				if (nodes.length != serverHosts.length) {
+					isUpdate = true;
+				} else {
+					for (int i = 0; i < nodes.length; i++) {
+						if (!nodes[i].equals(serverHost)) 
+							isNewNode = true;
+						else{
+							isNewNode = false;
+							break;
+						}
+					}
+					if(isNewNode){
+						serverHost = serverHosts[0];
+					}
+					for (int i = 0; i < nodes.length; i++) {
+						if (!nodes[i].equals(serverHosts[i])) {
+							isUpdate = true;
+							break;
+						}
 					}
 				}
 				if (isUpdate) {
