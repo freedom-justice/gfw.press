@@ -25,6 +25,6 @@
 >![运行截图3](https://github.com/lyx32/gfw.press/blob/master/images/3.png)<br/>
 
 
-
-<font color=#ffffff size=0 >更新于 2017-8-30</font> 
-<font color=#ffffff size=0 >更新于 2017-8-16</font> 
+更新于 2017-8-30<br/>
+更新于 2017-8-16<br/>
+计划重写个新版本，新版本不再官方版上进行二次开发<br/>
