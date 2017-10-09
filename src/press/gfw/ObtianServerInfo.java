@@ -53,6 +53,7 @@ public class ObtianServerInfo extends Thread {
 			}
 			config.log("成功获最新节点信息");
 			String html = getHtml("https://gfw.press/user/", null, "uid=" + uid + ";user_email=" + user_email + ";user_pwd=" + user_pwd);
+//			System.out.println(html);
 			String[] nodes = null;
 			String port = "";
 			String pwd = "";
@@ -60,11 +61,12 @@ public class ObtianServerInfo extends Thread {
 			Matcher m = p.matcher(html);
 			while (m.find()) {
 				String group = m.group(1);
-				if (group.contains("节点")) {
+				if (group.contains("地址")) {
 					List<String> nodeList = new ArrayList<String>();
 					while(m.find()){
 						group = m.group(1);
-						if(group.matches("^[\\d+\\.]+\\d+.*")){
+//						System.out.println(group);
+						if(group.matches("^[\\d+\\.]+\\d+.*") && null != group && !"".equals(group)){
 							nodeList.add(group.trim());
 						}
 						if(group.contains("端口")){
@@ -77,11 +79,13 @@ public class ObtianServerInfo extends Thread {
 					m.find();
 					group = m.group(1);
 					port = group.trim();
+//					System.out.println(group);
 				}
 				if (group.contains("密码")) {
 					m.find();
 					group = m.group(1);
 					pwd = group.trim();
+//					System.out.println(group);
 					break;
 				}
 			}

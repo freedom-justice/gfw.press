@@ -25,7 +25,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.sql.Timestamp;
-import java.util.Hashtable;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -41,28 +40,12 @@ public class Config {
 
 	public static final String CHARSET = "utf-8";
 
-	public static void main(String[] args) {
-
-		Config c = new Config();
-
-		Hashtable<String, String> users = c.getUser();
-
-		System.out.println(users);
-
-	}
-
-
 	private File configFile = null;
 
-	private File userFile = null;
-	
-
-	private long userFileTime = 0L;
 
 	public Config() {
 
 		configFile = new File("config.json");
-		userFile = new File("user.txt");
 		
 	}
 
@@ -143,53 +126,7 @@ public class Config {
 	}
 
 
-	public Hashtable<String, String> getUser() {
 
-		if (userFile.lastModified() == userFileTime) {
-
-			return null;
-
-		}
-
-		userFileTime = userFile.lastModified();
-
-		String text = read(userFile);
-
-		if (text == null) {
-
-			return null;
-
-		}
-
-		String[] lines = text.trim().split("\n");
-
-		text = null;
-
-		if (lines == null || lines.length == 0) {
-
-			return null;
-
-		}
-
-		Hashtable<String, String> users = new Hashtable<String, String>(lines.length);
-
-		for (int i = 0; i < lines.length; i++) {
-
-			String[] cols = lines[i].trim().split(" ");
-
-			if (cols == null || cols.length < 2 || !(cols[0] = cols[0].trim()).matches("\\d+") || (cols[cols.length - 1] = cols[cols.length - 1].trim()).length() < 8) {
-
-				continue;
-
-			}
-
-			users.put(cols[0], cols[cols.length - 1]);
-
-		}
-
-		return users.size() > 0 ? users : null;
-
-	}
 
 	/**
 	 * 打印信息

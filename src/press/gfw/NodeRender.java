@@ -29,7 +29,7 @@ public class NodeRender extends JPanel implements ListCellRenderer<String> {
 		this.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 3));
 		this.add(ctry);
 		this.add(node);
-		// this.add(ping);
+		 this.add(ping);
 		for (final String ip : nodes) {
 			new Thread(new Runnable() {
 				@Override

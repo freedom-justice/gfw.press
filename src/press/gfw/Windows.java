@@ -590,27 +590,18 @@ public class Windows extends JFrame implements IBroadcastCallback {
 		}).start();
 
 		if (client != null && !client.isKill()) {
-
 			if (serverHost.equals(client.getServerHost()) && serverPort.equals(String.valueOf(client.getServerPort()))
 					&& password.equals(client.getPassword())
 					&& proxyPort.equals(String.valueOf(client.getListenPort()))) {
-
 				return;
-
 			} else {
-
 				client.kill();
-
 			}
-
 		}
 
 		client = new Client(serverHost, serverPort, password, proxyPort);
-
 		client.start();
-
 		// log(client.getName());
-
 	}
 
 	/***
